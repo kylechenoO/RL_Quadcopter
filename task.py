@@ -67,7 +67,8 @@ class Up():
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
-        reward = -min(-1, -.3*(abs(self.sim.pose[:3] - self.target_pos)).sum())
+        # reward = 1-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum()
+        reward = -min(-1, 1-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum())
         if reward != 1:
             reward = - reward
         return(reward)
