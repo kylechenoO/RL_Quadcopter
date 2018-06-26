@@ -67,10 +67,17 @@ class Up():
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
-        # reward = 1-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum()
         reward = -min(-1, 1-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum())
-        if reward != 1:
-            reward = - reward
+        if reward < 1.5:
+            if abs(self.sim.angular_v[2]) < 0.01:
+                reward -= 1
+
+            else:
+                reward -= 0.5
+
+        else:
+            reward = -reward
+
         return(reward)
 
     def step(self, rotor_speeds):
