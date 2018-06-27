@@ -64,19 +64,19 @@ class Up():
 
         # Goal
         self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 10.]) 
+        self.target_z = self.target_pos[2]
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
-        reward = -min(-1, 1-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum())
-        if reward < 1.5:
-            if abs(self.sim.angular_v[2]) < 0.01:
-                reward -= 1
+        sim_z = self.sim.pose[2]
+        reward = -min(abs(self.target_z - sim_z), 20.0)
+        if sim_z > self.target_z:
+            reward += 10
+            self.sim.done = True
 
-            else:
-                reward -= 0.5
-
-        else:
-            reward = -reward
+        elif self.sim.time > self.sim.runtime:
+            reward -= 10
+            self.sim.done = True
 
         return(reward)
 
@@ -84,6 +84,7 @@ class Up():
         """Uses action to obtain next state, reward, done."""
         reward = 0
         pose_all = []
+        done = False
         for _ in range(self.action_repeat):
             done = self.sim.next_timestep(rotor_speeds) # update the sim pose and velocities
             reward += self.get_reward() 
@@ -92,6 +93,7 @@ class Up():
                 reward += 10
 
         next_state = np.concatenate(pose_all)
+        reward = np.tanh(reward)
         return(next_state, reward, done)
 
     def reset(self):
