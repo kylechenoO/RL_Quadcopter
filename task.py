@@ -78,6 +78,7 @@ class Up():
             reward -= 10
             self.sim.done = True
 
+        reward = np.tanh(reward)
         return(reward)
 
     def step(self, rotor_speeds):
@@ -89,11 +90,10 @@ class Up():
             done = self.sim.next_timestep(rotor_speeds) # update the sim pose and velocities
             reward += self.get_reward() 
             pose_all.append(self.sim.pose)
-            if done:
-                reward += 10
+            # if done:
+                # reward += 10
 
         next_state = np.concatenate(pose_all)
-        reward = np.tanh(reward)
         return(next_state, reward, done)
 
     def reset(self):
